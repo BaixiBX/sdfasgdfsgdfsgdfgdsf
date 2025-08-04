@@ -1,73 +1,58 @@
-local function addHighlightAndName(player)
-    if player == game.Players.LocalPlayer then return end
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- 创建高亮和头上文字
+local function addESP(player)
+    if player == LocalPlayer then return end
     player.CharacterAdded:Connect(function(character)
+        -- 等待 HumanoidRootPart 出现
+        local hrp = character:WaitForChild("HumanoidRootPart", 5)
+        if not hrp then return end
+
         -- 添加绿色高光
-        if not character:FindFirstChild("ESPHighlight") then
+        if not character:FindFirstChild("PlayerHighlight") then
             local highlight = Instance.new("Highlight")
-            highlight.Name = "ESPHighlight"
-            highlight.FillColor = Color3.fromRGB(0,255,0)
-            highlight.OutlineColor = Color3.fromRGB(0,255,0)
+            highlight.Name = "PlayerHighlight"
+            highlight.FillColor = Color3.fromRGB(0, 255, 0)
+            highlight.OutlineColor = Color3.new(0, 0, 0)
+            highlight.FillTransparency = 0.25
+            highlight.OutlineTransparency = 0
+            highlight.Adornee = character
             highlight.Parent = character
         end
-        -- 添加头顶名字
-        local head = character:FindFirstChild("Head")
-        if head and not head:FindFirstChild("ESPName") then
+
+        -- 添加头上名字
+        if not character:FindFirstChild("NameBillboard") then
             local billboard = Instance.new("BillboardGui")
-            billboard.Name = "ESPName"
-            billboard.Adornee = head
+            billboard.Name = "NameBillboard"
+            billboard.Adornee = hrp
             billboard.Size = UDim2.new(0, 200, 0, 50)
-            billboard.StudsOffset = Vector3.new(0, 2, 0)
+            billboard.StudsOffset = Vector3.new(0, 3, 0)
             billboard.AlwaysOnTop = true
+            billboard.Parent = character
 
             local textLabel = Instance.new("TextLabel")
-            textLabel.Parent = billboard
             textLabel.Size = UDim2.new(1, 0, 1, 0)
             textLabel.BackgroundTransparency = 1
             textLabel.Text = player.Name
             textLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
             textLabel.TextStrokeTransparency = 0.5
-            textLabel.Font = Enum.Font.SourceSansBold
             textLabel.TextScaled = true
-
-            billboard.Parent = head
+            textLabel.Font = Enum.Font.SourceSansBold
+            textLabel.Parent = billboard
         end
     end)
-    -- 已存在角色也处理
+
+    -- 如果角色已经存在，也立即添加
     if player.Character then
-        local character = player.Character
-        if not character:FindFirstChild("ESPHighlight") then
-            local highlight = Instance.new("Highlight")
-            highlight.Name = "ESPHighlight"
-            highlight.FillColor = Color3.fromRGB(0,255,0)
-            highlight.OutlineColor = Color3.fromRGB(0,255,0)
-            highlight.Parent = character
-        end
-        local head = character:FindFirstChild("Head")
-        if head and not head:FindFirstChild("ESPName") then
-            local billboard = Instance.new("BillboardGui")
-            billboard.Name = "ESPName"
-            billboard.Adornee = head
-            billboard.Size = UDim2.new(0, 200, 0, 50)
-            billboard.StudsOffset = Vector3.new(0, 2, 0)
-            billboard.AlwaysOnTop = true
-
-            local textLabel = Instance.new("TextLabel")
-            textLabel.Parent = billboard
-            textLabel.Size = UDim2.new(1, 0, 1, 0)
-            textLabel.BackgroundTransparency = 1
-            textLabel.Text = player.Name
-            textLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
-            textLabel.TextStrokeTransparency = 0.5
-            textLabel.Font = Enum.Font.SourceSansBold
-            textLabel.TextScaled = true
-
-            billboard.Parent = head
-        end
+        player.Character:Destroy()  -- 触发 CharacterAdded（保险处理）
     end
 end
 
--- 启用玩家高亮和名字显示
-for _, player in ipairs(game.Players:GetPlayers()) do
-    addHighlightAndName(player)
+-- 为当前所有玩家添加
+for _, player in ipairs(Players:GetPlayers()) do
+    addESP(player)
 end
-game.Players.PlayerAdded:Connect(addHighlightAndName)
+
+-- 监听新玩家
+Players.PlayerAdded:Connect(addESP)
