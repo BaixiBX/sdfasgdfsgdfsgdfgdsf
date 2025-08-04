@@ -1,0 +1,55 @@
+-- 玩家ESP绿色高光名字显示头顶
+for _, player in ipairs(game.Players:GetPlayers()) do
+    if player ~= game.Players.LocalPlayer then
+        player.CharacterAdded:Connect(function(character)
+            local head = character:FindFirstChild("Head")
+            if head and not head:FindFirstChild("ESPName") then
+                local billboard = Instance.new("BillboardGui")
+                billboard.Name = "ESPName"
+                billboard.Adornee = head
+                billboard.Size = UDim2.new(0, 200, 0, 50)
+                billboard.StudsOffset = Vector3.new(0, 2, 0)
+                billboard.AlwaysOnTop = true
+
+                local textLabel = Instance.new("TextLabel")
+                textLabel.Parent = billboard
+                textLabel.Size = UDim2.new(1, 0, 1, 0)
+                textLabel.BackgroundTransparency = 1
+                textLabel.Text = player.Name
+                textLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+                textLabel.TextStrokeTransparency = 0.5
+                textLabel.Font = Enum.Font.SourceSansBold
+                textLabel.TextScaled = true
+
+                billboard.Parent = head
+            end
+        end)
+    end
+end
+
+-- 已存在玩家也添加ESP
+for _, player in ipairs(game.Players:GetPlayers()) do
+    if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
+        local head = player.Character.Head
+        if not head:FindFirstChild("ESPName") then
+            local billboard = Instance.new("BillboardGui")
+            billboard.Name = "ESPName"
+            billboard.Adornee = head
+            billboard.Size = UDim2.new(0, 200, 0, 50)
+            billboard.StudsOffset = Vector3.new(0, 2, 0)
+            billboard.AlwaysOnTop = true
+
+            local textLabel = Instance.new("TextLabel")
+            textLabel.Parent = billboard
+            textLabel.Size = UDim2.new(1, 0, 1, 0)
+            textLabel.BackgroundTransparency = 1
+            textLabel.Text = player.Name
+            textLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+            textLabel.TextStrokeTransparency = 0.5
+            textLabel.Font = Enum.Font.SourceSansBold
+            textLabel.TextScaled = true
+
+            billboard.Parent = head
+        end
+    end
+end
